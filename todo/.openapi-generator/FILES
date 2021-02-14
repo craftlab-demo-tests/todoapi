@@ -1,0 +1,17 @@
+.gitignore
+.travis.yml
+README.md
+api/openapi.yaml
+api_default.go
+client.go
+configuration.go
+docs/DefaultApi.md
+docs/Todo.md
+docs/TodoList.md
+git_push.sh
+go.mod
+go.sum
+model_todo.go
+model_todo_list.go
+response.go
+utils.go

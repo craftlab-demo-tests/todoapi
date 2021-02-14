@@ -1,0 +1,74 @@
+openapi: 3.0.2
+info:
+  title: user-service
+  version: "1.0"
+servers:
+- url: https://raw.githubusercontent.com/
+paths:
+  /users:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+          description: OK
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "201":
+          description: created
+  /users/{id}:
+    get:
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: OK
+        "404":
+          description: Not Found
+components:
+  schemas:
+    User:
+      example:
+        name: name
+        id: 6
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+      required:
+      - name
+      type: object
+    UserList:
+      example:
+        count: 0
+        users:
+        - name: name
+          id: 6
+        - name: name
+          id: 6
+      properties:
+        count:
+          type: integer
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+      type: object
