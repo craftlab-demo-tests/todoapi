@@ -13,6 +13,7 @@ RUN go install -v ./...
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/todoapi /app
+COPY ./templates /app/templates
 ENTRYPOINT ./app
 LABEL Name=todoapi Version=0.0.1
 EXPOSE 8080

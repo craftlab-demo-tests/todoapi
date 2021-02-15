@@ -24,6 +24,11 @@ func newDefaultApp() (*app, error) {
 
 	todoConfig := todoclient.NewConfiguration()
 	userConfig := userclient.NewConfiguration()
+	userConfig.Servers = userclient.ServerConfigurations{
+		userclient.ServerConfiguration{
+			URL: "http://userservice:8080",
+		},
+	}
 	return &app{
 		templates:  tmpl,
 		todoclient: todoclient.NewAPIClient(todoConfig),
@@ -36,8 +41,8 @@ func (a app) registerRoute(router *mux.Router) {
 }
 
 func (a app) HandleGetUser(w http.ResponseWriter, r *http.Request) {
-	type getuserdata struct {
-		username string
+	type Getuserdata struct {
+		Username string
 	}
 
 	idstr := mux.Vars(r)["id"]
@@ -53,7 +58,7 @@ func (a app) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		a.templates.ExecuteTemplate(w, "servererror.html", nil)
 	}
 
-	a.templates.ExecuteTemplate(w, "getuserid.html", getuserdata{
-		username: u.GetName(),
+	a.templates.ExecuteTemplate(w, "getuserid.html", Getuserdata{
+		Username: u.GetName(),
 	})
 }

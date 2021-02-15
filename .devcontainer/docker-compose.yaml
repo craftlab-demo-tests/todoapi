@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  todoapi:
+      build: .
+      image: worming/todoapi
+      volumes:
+        - ../:/go/src/todoapi
+      entrypoint: zsh -c "while sleep 1000; do :; done"
+  userservice:
+      image: worming/userservice:latest
+      
