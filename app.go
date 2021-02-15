@@ -41,6 +41,7 @@ func (a app) registerRoute(router *mux.Router) {
 }
 
 func (a app) HandleGetUser(w http.ResponseWriter, r *http.Request) {
+
 	type Getuserdata struct {
 		Username string
 	}
@@ -51,14 +52,35 @@ func (a app) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		a.templates.ExecuteTemplate(w, "badrequest.html", nil)
 	}
+
 	request := a.userclient.DefaultApi.UsersIdGet(r.Context(), int32(id))
-	u, _, err := request.Execute()
+	feed := make(chan getUserAsyncResult)
+	go usersIdGetAsync(request, feed)
+
+	res := <-feed
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		a.templates.ExecuteTemplate(w, "servererror.html", nil)
 	}
 
 	a.templates.ExecuteTemplate(w, "getuserid.html", Getuserdata{
-		Username: u.GetName(),
+		Username: res.user.GetName(),
 	})
+}
+
+type getUserAsyncResult struct {
+	user     userclient.User
+	response *http.Response
+	err      error
+}
+
+func usersIdGetAsync(r userclient.ApiUsersIdGetRequest, feed chan getUserAsyncResult) {
+	u, httpres, err := r.Execute()
+	res := getUserAsyncResult{
+		user:     u,
+		response: httpres,
+		err:      err,
+	}
+	feed <- res
 }
