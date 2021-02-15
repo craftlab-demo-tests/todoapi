@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"strconv"
 
 	todoclient "github.com/craftlab-demo-tests/todoapi/todo"
 	userclient "github.com/craftlab-demo-tests/todoapi/user"
@@ -35,5 +36,24 @@ func (a app) registerRoute(router *mux.Router) {
 }
 
 func (a app) HandleGetUser(w http.ResponseWriter, r *http.Request) {
-	a.templates.ExecuteTemplate(w, "getuserid.html", nil)
+	type getuserdata struct {
+		username string
+	}
+
+	idstr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		a.templates.ExecuteTemplate(w, "badrequest.html", nil)
+	}
+	request := a.userclient.DefaultApi.UsersIdGet(r.Context(), int32(id))
+	u, _, err := request.Execute()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		a.templates.ExecuteTemplate(w, "servererror.html", nil)
+	}
+
+	a.templates.ExecuteTemplate(w, "getuserid.html", getuserdata{
+		username: u.GetName(),
+	})
 }
